@@ -122,6 +122,7 @@ class vsftpd::params {
   $use_localtime           = false
   $user_config_dir         = ''
   $userlist_enable         = true
+  $userlist_deny           = false
   $userlist_file           = $::operatingsystem ? {
     /(?i:Debian|Ubuntu|Mint)/ => '/etc/vsftpd.user_list',
     default                   => '/etc/vsftpd/user_list',

@@ -288,6 +288,12 @@
 #   will be denied before they are asked for a password. This may  be  useful  in
 #   preventing cleartext passwords being transmitted
 #
+# [*userlist_deny*]
+#   This option is examined if userlist_enable is activated. If you set this
+#   setting to NO, then users will be denied login unless they are explicitly
+#   listed in the file specified by userlist_file.  When login is denied, the
+#   denial is issued before the user is asked for a password.
+#
 # [*userlist_file*]
 #   Default: /etc/vsftpd/user_list
 #
@@ -543,6 +549,7 @@ class vsftpd (
   $tcp_wrappers            = params_lookup( 'tcp_wrappers' ),
   $use_localtime           = params_lookup( 'use_localtime' ),
   $userlist_enable         = params_lookup( 'userlist_enable' ),
+  $userlist_deny           = params_lookup( 'userlist_deny' ),
   $userlist_file           = params_lookup( 'userlist_file' ),
   $userlist_file_source    = params_lookup( 'userlist_file_source' ),
   $write_enable            = params_lookup( 'write_enable' ),
@@ -609,6 +616,7 @@ class vsftpd (
   $bool_tcp_wrappers=any2bool($tcp_wrappers)
   $bool_use_localtime=any2bool($use_localtime)
   $bool_userlist_enable=any2bool($userlist_enable)
+  $bool_userlist_deny=any2bool($userlist_deny)
   $bool_write_enable=any2bool($write_enable)
   $bool_xferlog_enable=any2bool($xferlog_enable)
   $bool_xferlog_std_format=any2bool($xferlog_std_format)
@@ -698,6 +706,11 @@ class vsftpd (
   }
 
   $real_userlist_enable = $vsftpd::bool_userlist_enable ? {
+    true  => 'YES',
+    false => 'NO',
+  }
+
+  $real_userlist_deny = $vsftpd::bool_userlist_deny ? {
     true  => 'YES',
     false => 'NO',
   }

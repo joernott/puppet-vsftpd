@@ -50,6 +50,9 @@ local_umask=<%= scope.lookupvar('vsftpd::local_umask') %>
 <% if scope.lookupvar('vsftpd::userlist_enable') != '' -%>
 userlist_enable=<%= scope.lookupvar('vsftpd::real_userlist_enable') %>
 userlist_file=<%= scope.lookupvar('vsftpd::userlist_file') %>
+<% if scope.lookupvar('vsftpd::userlist_deny') != '' -%>
+userlist_deny=<%= scope.lookupvar('vsftpd::real_userlist_deny') %>
+<% end -%>
 <% end -%>
 
 # Logging related paremeters
