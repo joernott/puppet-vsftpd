@@ -297,6 +297,11 @@
 # [*userlist_file*]
 #   Default: /etc/vsftpd/user_list
 #
+# [*user_list*]
+#   If this hash is defined, the user_list will be taken from the hash instead
+#   of using the static user_list.
+#   Default: undef
+#
 # [*write_enable*]
 #   Enable any form of FTP write command.  (Default true)
 #
@@ -552,6 +557,7 @@ class vsftpd (
   $userlist_deny           = params_lookup( 'userlist_deny' ),
   $userlist_file           = params_lookup( 'userlist_file' ),
   $userlist_file_source    = params_lookup( 'userlist_file_source' ),
+  $user_list               = params_lookup( 'user_list' ),
   $write_enable            = params_lookup( 'write_enable' ),
   $xferlog_enable          = params_lookup( 'xferlog_enable' ),
   $xferlog_std_format      = params_lookup( 'xferlog_std_format' ),
@@ -921,17 +927,33 @@ class vsftpd (
   }
 
   if $vsftpd::bool_userlist_enable == true {
-    file { 'userlist_file':
-      ensure  => $vsftpd::manage_file,
-      path    => $vsftpd::userlist_file,
-      mode    => $vsftpd::config_file_mode,
-      owner   => $vsftpd::config_file_owner,
-      group   => $vsftpd::config_file_group,
-      require => Package['vsftpd'],
-      notify  => $vsftpd::manage_service_autorestart,
-      source  => $vsftpd::manage_userlist_file_source,
-      replace => $vsftpd::manage_file_replace,
-      audit   => $vsftpd::manage_audit,
+    if is_array($user_list) == true {
+      file { 'userlist_file':
+        ensure  => $vsftpd::manage_file,
+        path    => $vsftpd::userlist_file,
+        mode    => $vsftpd::config_file_mode,
+        owner   => $vsftpd::config_file_owner,
+        group   => $vsftpd::config_file_group,
+        require => Package['vsftpd'],
+        notify  => $vsftpd::manage_service_autorestart,
+        content => template('vsftpd/user_list.erb'),
+        replace => $vsftpd::manage_file_replace,
+        audit   => $vsftpd::manage_audit,
+      }
+    }
+    else {
+      file { 'userlist_file':
+        ensure  => $vsftpd::manage_file,
+        path    => $vsftpd::userlist_file,
+        mode    => $vsftpd::config_file_mode,
+        owner   => $vsftpd::config_file_owner,
+        group   => $vsftpd::config_file_group,
+        require => Package['vsftpd'],
+        notify  => $vsftpd::manage_service_autorestart,
+        source  => $vsftpd::manage_userlist_file_source,
+        replace => $vsftpd::manage_file_replace,
+        audit   => $vsftpd::manage_audit,
+      }
     }
   }
 

@@ -10,7 +10,7 @@
 #
 class vsftpd::pam_mysql(
   $pam_file          = '/etc/pam.d/vsftpd',
-  $ftpusers_file     = '',
+  $ftpusers_file     = '/etc/vsftpd/ftpusers',
   $sql_user          = 'ftpd',
   $sql_password      = '',
   $sql_host          = 'localhost',
@@ -24,14 +24,15 @@ class vsftpd::pam_mysql(
   $sql_logpidcolumn  = 'pid',
   $sql_loghostcolumn = 'host',
   $sql_logtimecolumn = 'time',
-  $sql_logmsgcolumn  = 'msg'
+  $sql_logmsgcolumn  = 'msg',
+  $debug             = false
 ) {
 
   package { 'pam_mysql' :
     ensure => latest
   }
 
-  file { 'pam.d_vsftpd':
+  file { '/etc/pam.d/vsftpd':
     ensure   => file,
     path     => $pam_file,
     mode     => '0600',
@@ -39,5 +40,23 @@ class vsftpd::pam_mysql(
     group    => 'root',
     require  => Package['pam_mysql'],
     content  => template('vsftpd/pam_mysql.erb')
+  }
+
+  if $ftpusers_file == '' {
+    file { '/etc/vsftpd/ftpusers': 
+      ensure => absent,
+      path   => $ftpusers_file
+    }
+  }
+  else {
+    file { '/etc/vsftpd/ftpusers':
+      ensure   => file,
+      path     => $ftpusers_file,
+      mode     => '0644',
+      owner    => 'root',
+      group    => 'root',
+      require  => Package['pam_mysql', 'vsftpd'],
+      source   => 'puppet:///modules/vsftpd/user_list',
+    }
   }
 }

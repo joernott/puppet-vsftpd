@@ -128,6 +128,7 @@ class vsftpd::params {
     default                   => '/etc/vsftpd/user_list',
   }
   $userlist_file_source    = 'puppet:///modules/vsftpd/user_list'
+  $user_list               = false
   $user_sub_token          = ''
   $virtual_use_local_privs = false
   $write_enable            = true
@@ -166,7 +167,7 @@ class vsftpd::params {
   $source = ''
   $source_dir = ''
   $source_dir_purge = false
-  $template = ''
+  $template = 'vsftpd/vsftpd.conf.erb'
   $options = ''
   $service_autorestart = true
   $version = 'present'
